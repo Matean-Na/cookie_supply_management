@@ -1,0 +1,74 @@
+version: '3.9'
+
+services:
+  app:
+    container_name: cookie-supply-management-app
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - redis
+    command: ["./api"]
+    networks:
+      - default
+    env_file:
+      - .env
+
+  db:
+    image: postgres:latest
+    container_name: cookie-supply-management-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - default
+    env_file:
+      - .env
+
+  seeder:
+    container_name: cookie-supply-management-seed
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: on-failure
+    depends_on:
+      - db
+      - redis
+    command: ["./seeder"]
+    networks:
+      - default
+    env_file:
+      - .env
+
+  redis:
+    image: redis
+    container_name: cookie-supply-management-redis
+    restart: always
+    command: [ "redis-server", "--requirepass", "$${REDIS_PASSWORD}", "--databases", "16" ]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - default
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: cookie-supply-management_net1
