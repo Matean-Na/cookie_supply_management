@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
+	"time"
 )
 
 type UserRepositoryInterface interface {
@@ -39,8 +40,8 @@ func (r *UserRepository) SelectExistByUserName(username string) error {
 
 func (r *UserRepository) SelectUserByUsername(username string) (models.User, error) {
 	var user models.User
-	if err := r.db.Where("username = ?", username).First(&user).Error; err != nil {
-		return models.User{}, err
+	if err := r.db.Where("username = ?", username).First(&user).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		return models.User{}, errors.New("пользователь не найден")
 	}
 
 	return user, nil
@@ -59,7 +60,7 @@ func (r *UserRepository) InsertUser(username, password, role string) error {
 }
 
 func (r *UserRepository) SetToken(username, token string) error {
-	return r.rds.Set(context.Background(), username, token, 0).Err()
+	return r.rds.Set(context.Background(), username, token, 15*time.Minute).Err()
 }
 
 func (r *UserRepository) GetToken(username string) (string, error) {
