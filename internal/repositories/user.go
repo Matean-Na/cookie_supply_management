@@ -13,6 +13,7 @@ type UserRepositoryInterface interface {
 	SelectExistByUserName(username string) error
 	SelectUserByUsername(username string) (models.User, error)
 	InsertUser(username, password, role string) error
+	UpdateUser(user models.User) error
 
 	SetToken(username, token string) error
 	GetToken(username string) (string, error)
@@ -24,10 +25,19 @@ type UserRepository struct {
 	rds *redis.Client
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
+func NewUserRepository(db *gorm.DB, rds *redis.Client) *UserRepository {
 	return &UserRepository{
-		db: db,
+		db:  db,
+		rds: rds,
 	}
+}
+
+func (r *UserRepository) UpdateUser(user models.User) error {
+	if err := r.db.Save(&user).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *UserRepository) SelectExistByUserName(username string) error {
@@ -48,7 +58,7 @@ func (r *UserRepository) SelectUserByUsername(username string) (models.User, err
 }
 
 func (r *UserRepository) InsertUser(username, password, role string) error {
-	if err := r.db.Create(models.User{
+	if err := r.db.Create(&models.User{
 		Username: username,
 		Password: password,
 		Role:     role,

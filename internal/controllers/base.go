@@ -7,15 +7,15 @@ import (
 )
 
 type AppError struct {
-	Error string
-	Code  int
+	Error string `json:"error"`
+	Code  int    `json:"code"`
 }
 
 type AppHandler func(ctx *gin.Context) *AppError
 
 func (a AppHandler) Handle(ctx *gin.Context) {
 	if err := a(ctx); err != nil {
-		ctx.JSON(err.Code, gin.H{"error": err})
+		ctx.JSON(err.Code, err)
 	}
 }
 
@@ -35,12 +35,10 @@ func OkMessage(ctx *gin.Context, message string) *AppError {
 }
 
 func BaseError(err string, code int) *AppError {
-	appError := &AppError{
+	return &AppError{
 		Error: err,
 		Code:  code,
 	}
-
-	return appError
 }
 
 func GetPager(ctx *gin.Context) (int, int) {

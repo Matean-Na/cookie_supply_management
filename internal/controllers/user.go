@@ -26,7 +26,43 @@ func (uc *UserController) Register(r *gin.RouterGroup, s string) *gin.RouterGrou
 	g.POST("login", AppHandler(uc.Login).Handle)
 	g.POST("registration", uc.middleware.Authentication(), AppHandler(uc.Registration).Handle)
 	g.POST("logout", uc.middleware.Authentication(constants.Accountant), AppHandler(uc.Logout).Handle)
+	g.PATCH("update", uc.middleware.Authentication(constants.Accountant), AppHandler(uc.Update).Handle)
+
+	g.GET("", uc.middleware.Authentication(constants.Accountant), AppHandler(uc.GetOne).Handle)
 	return g
+}
+
+func (uc *UserController) GetOne(ctx *gin.Context) *AppError {
+	username, exists := ctx.Get("username")
+	if !exists {
+		return BaseError("имя пользователя не найдено в контексте", http.StatusInternalServerError)
+	}
+
+	user, err := uc.service.GetByUsername(username.(string))
+	if err != nil {
+		return BaseError(err.Error(), http.StatusBadRequest)
+	}
+
+	return Ok(ctx, user)
+}
+
+func (uc *UserController) Update(ctx *gin.Context) *AppError {
+	var input dto.UserUpdateDTO
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		return BaseError(err.Error(), http.StatusBadRequest)
+	}
+
+	username, exists := ctx.Get("username")
+	if !exists {
+		return BaseError("имя пользователя не найдено в контексте", http.StatusInternalServerError)
+	}
+
+	httpCode, err := uc.service.Update(username.(string), input)
+	if err != nil {
+		return BaseError(err.Error(), httpCode)
+	}
+
+	return Ok(ctx, gin.H{"message": "success"})
 }
 
 func (uc *UserController) Logout(ctx *gin.Context) *AppError {

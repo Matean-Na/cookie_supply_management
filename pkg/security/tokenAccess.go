@@ -5,6 +5,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type TokenDetails struct {
@@ -20,11 +21,11 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func GenerateToken(username string, jwtKey string) (string, error) {
+func GenerateToken(username string, jwtKey string, expiresIn time.Duration) (string, error) {
 	claims := &Claims{
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: 0,
+			ExpiresAt: time.Now().Add(expiresIn).Unix(),
 		},
 	}
 

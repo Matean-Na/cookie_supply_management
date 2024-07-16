@@ -4,6 +4,7 @@ import (
 	"cookie_supply_management/core/config"
 	"cookie_supply_management/core/connect"
 	"cookie_supply_management/core/database"
+	"cookie_supply_management/core/redis"
 	"cookie_supply_management/internal/repositories"
 	"cookie_supply_management/internal/services"
 	"cookie_supply_management/pkg/logger"
@@ -34,8 +35,11 @@ func (s *Server) Init() (*gin.Engine, error) {
 		return nil, err
 	}
 
+	//init redis
+	rds := redis.New(conf.Redis)
+
 	//init entities
-	repo := repositories.NewRepository(dbase)
+	repo := repositories.NewRepository(dbase, rds)
 	service := services.NewService(repo, conf)
 
 	//init logger

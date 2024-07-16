@@ -20,7 +20,8 @@ type Database struct {
 }
 
 type Token struct {
-	SecretKey string
+	SecretKey    string
+	DurationHour int
 }
 
 type Dir struct {
@@ -70,7 +71,8 @@ func LoadFromFile(path string) (*Config, error) {
 			SslMode:  viper.GetString("DB_SSLMODE"),
 		},
 		Token: Token{
-			SecretKey: viper.GetString("TOKEN_SECRET_KEY"),
+			SecretKey:    viper.GetString("TOKEN_SECRET_KEY"),
+			DurationHour: viper.GetInt("TOKEN_DURATION_HOUR"),
 		},
 		Dir: Dir{
 			Media:    viper.GetString("DIR_MEDIA"),

@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"cookie_supply_management/core/config"
+	"cookie_supply_management/internal/constants"
 	"cookie_supply_management/internal/services"
 	"cookie_supply_management/pkg/security"
 	"github.com/gin-gonic/gin"
@@ -28,7 +29,7 @@ func (m *AuthMiddleware) Authentication(allowedRoles ...string) gin.HandlerFunc 
 		claims, err := security.ValidateToken(tokenString, config.Get().Token.SecretKey)
 		if err != nil {
 			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"Error": err.Error(),
+				"Error": "неверный токен",
 				"Code":  http.StatusUnauthorized,
 			})
 			ctx.Abort()
@@ -38,7 +39,7 @@ func (m *AuthMiddleware) Authentication(allowedRoles ...string) gin.HandlerFunc 
 		_, err = m.service.GetToken(claims.Username)
 		if err != nil {
 			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"Error": err.Error(),
+				"Error": "токен не найден",
 				"Code":  http.StatusUnauthorized,
 			})
 			ctx.Abort()
@@ -51,7 +52,7 @@ func (m *AuthMiddleware) Authentication(allowedRoles ...string) gin.HandlerFunc 
 		user, err := m.service.GetByUsername(username)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"Error": err.Error(),
+				"Error": "пользователь не найден",
 				"Code":  http.StatusInternalServerError,
 			})
 			return
@@ -59,7 +60,7 @@ func (m *AuthMiddleware) Authentication(allowedRoles ...string) gin.HandlerFunc 
 
 		//check permission
 		if !isRoleAllowed(user.Role, allowedRoles...) {
-			ctx.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
+			ctx.JSON(http.StatusForbidden, gin.H{"error": "Доступ запрещен"})
 			ctx.Abort()
 			return
 		}
@@ -74,7 +75,7 @@ func isRoleAllowed(role string, allowedRoles ...string) bool {
 		allowedRolesMap[allowedRole] = true
 	}
 
-	if allowedRolesMap["Admin"] {
+	if role == constants.Admin {
 		return true
 	}
 
