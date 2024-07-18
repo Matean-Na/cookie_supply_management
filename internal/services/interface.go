@@ -7,6 +7,7 @@ import (
 
 type Service struct {
 	UserServiceInterface
+	StoreServiceInterface
 }
 
 func NewService(
@@ -14,6 +15,7 @@ func NewService(
 	conf *config.Config,
 ) *Service {
 	return &Service{
-		UserServiceInterface: NewUserService(repos, conf),
+		UserServiceInterface:  NewUserService(repos, conf),
+		StoreServiceInterface: NewStoreService(repos, conf),
 	}
 }

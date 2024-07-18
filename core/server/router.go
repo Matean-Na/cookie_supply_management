@@ -25,6 +25,7 @@ func SetupRoutesWithDeps(service *services.Service) *gin.Engine {
 	{
 		r := orderedmap.NewOrderedMap()
 		r.Set("user", controllers.NewUserController(service.UserServiceInterface, middleware.AuthMiddlewareInterface))
+		r.Set("store", controllers.NewStoreController(service.StoreServiceInterface, middleware.AuthMiddlewareInterface))
 
 		for g := r.Front(); g != nil; g = g.Next() {
 			if c, ok := g.Value.(Controller); ok {
