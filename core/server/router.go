@@ -26,6 +26,7 @@ func SetupRoutesWithDeps(service *services.Service, serviceCrud base_service.Cru
 	{
 		r := orderedmap.NewOrderedMap()
 		r.Set("user", controllers.NewUserController(service.UserServiceInterface, middleware.AuthMiddlewareInterface))
+		r.Set("store", controllers.NewStoreController(service.StoreServiceInterface, middleware.AuthMiddlewareInterface))
 		r.Set("cookie_type", controllers.NewCookieTypeController(serviceCrud))
 
 		for g := r.Front(); g != nil; g = g.Next() {

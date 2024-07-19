@@ -49,6 +49,7 @@ func Recreate(config config.Database, sysDb string) error {
 var Models = []interface{}{
 	//auth
 	&models.User{},
+	&models.Store{},
 
 	//cookie
 	&models.Cookie{},
