@@ -1,10 +1,10 @@
-package generic_seed
+package base_seed
 
 import (
 	"bytes"
 	"cookie_supply_management/core/config"
 	"cookie_supply_management/core/connect"
-	"cookie_supply_management/internal/models"
+	"cookie_supply_management/pkg/base/base_model"
 	"encoding/json"
 	"fmt"
 	"gorm.io/gorm"
@@ -38,13 +38,13 @@ func (s *GenericSeed) Seed() (Summary, error) {
 }
 
 func NewGenericSeed(model interface{}) GenericSeed {
-	tableName := models.GetTableName(model, connect.DB)
+	tableName := base_model.GetTableName(model, connect.DB)
 	query := connect.DB.Table(tableName)
 	return GenericSeed{Model: model, Query: query}
 }
 
 func (s *GenericSeed) Log(message string, values ...interface{}) error {
-	tableName := models.GetTableName(s.Model, connect.DB)
+	tableName := base_model.GetTableName(s.Model, connect.DB)
 	if len(values) != 0 {
 		message = fmt.Sprintf(message, values)
 	}
@@ -60,7 +60,7 @@ func (s *GenericSeed) LogFail(message string, values ...interface{}) {
 }
 
 func (s *GenericSeed) GetFileName() string {
-	tableName := models.GetTableName(s.Model, connect.DB)
+	tableName := base_model.GetTableName(s.Model, connect.DB)
 	return fmt.Sprintf("%s.json", tableName)
 }
 
@@ -117,7 +117,7 @@ func (s *GenericSeed) Exists(kwargs interface{}) bool {
 		)
 	`
 
-	data.TableName = models.GetTableName(s.Model, connect.DB)
+	data.TableName = base_model.GetTableName(s.Model, connect.DB)
 
 	var tmpl *template.Template = template.New("exists")
 	tmpl.Parse(existsTemplate)
@@ -160,7 +160,7 @@ func (s *GenericSeed) ExistsToField(data KwargsToField) bool {
 		)
 	`
 
-	data.TableName = models.GetTableName(s.Model, connect.DB)
+	data.TableName = base_model.GetTableName(s.Model, connect.DB)
 
 	var tmpl *template.Template = template.New("exists")
 	tmpl.Parse(existsTemplate)
@@ -204,6 +204,6 @@ func (s *GenericSeed) Summarize() {
 	exist := fmt.Sprintf("%s %d exist %s", colorYellow, s.Summary.Exist, colorReset)
 	errors := fmt.Sprintf("%s %d errors %s", colorRed, s.Summary.Errors, colorReset)
 	update := fmt.Sprintf("%s %d updated %s", colorGreen, s.Summary.Updated, colorReset)
-	tableName := models.GetTableName(s.Model, connect.DB)
+	tableName := base_model.GetTableName(s.Model, connect.DB)
 	log.Printf("[%s] summary: %s - %s - %s - %s", tableName, created, update, exist, errors)
 }

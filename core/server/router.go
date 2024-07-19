@@ -5,6 +5,7 @@ import (
 	"cookie_supply_management/internal/controllers"
 	"cookie_supply_management/internal/middlewares"
 	"cookie_supply_management/internal/services"
+	"cookie_supply_management/pkg/base/base_service"
 	"github.com/elliotchance/orderedmap"
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +14,7 @@ type Controller interface {
 	Register(r *gin.RouterGroup, s string) *gin.RouterGroup
 }
 
-func SetupRoutesWithDeps(service *services.Service) *gin.Engine {
+func SetupRoutesWithDeps(service *services.Service, serviceCrud base_service.CrudServiceInterface) *gin.Engine {
 	//init middlewares
 	middleware := middlewares.NewMiddlewares(service)
 
@@ -25,6 +26,7 @@ func SetupRoutesWithDeps(service *services.Service) *gin.Engine {
 	{
 		r := orderedmap.NewOrderedMap()
 		r.Set("user", controllers.NewUserController(service.UserServiceInterface, middleware.AuthMiddlewareInterface))
+		r.Set("cookie_type", controllers.NewCookieTypeController(serviceCrud))
 
 		for g := r.Front(); g != nil; g = g.Next() {
 			if c, ok := g.Value.(Controller); ok {

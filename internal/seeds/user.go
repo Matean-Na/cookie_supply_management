@@ -2,21 +2,21 @@ package seeds
 
 import (
 	"cookie_supply_management/internal/models"
-	"cookie_supply_management/pkg/generic_seed"
+	"cookie_supply_management/pkg/base/base_seed"
 	"cookie_supply_management/pkg/security"
 	"encoding/json"
 )
 
 type UserSeed struct {
-	*generic_seed.GenericSeed
+	*base_seed.GenericSeed
 }
 
 func NewUserSeed() *UserSeed {
-	s := generic_seed.NewGenericSeed(models.User{})
+	s := base_seed.NewGenericSeed(models.User{})
 	return &UserSeed{&s}
 }
 
-func (s *UserSeed) Seed() (generic_seed.Summary, error) {
+func (s *UserSeed) Seed() (base_seed.Summary, error) {
 	defer s.Summarize()
 	data, err := s.LoadFixture()
 	if err != nil {

@@ -49,6 +49,10 @@ func Recreate(config config.Database, sysDb string) error {
 var Models = []interface{}{
 	//auth
 	&models.User{},
+
+	//cookie
+	&models.Cookie{},
+	&models.CookieType{},
 }
 
 func Connect(config config.Database) (*gorm.DB, error) {

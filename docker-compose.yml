@@ -16,7 +16,7 @@ services:
     networks:
       - default
     env_file:
-      - .env
+      - .env.docker
 
   db:
     image: postgres:latest
@@ -32,7 +32,8 @@ services:
     networks:
       - default
     env_file:
-      - .env
+      - .env.docker
+    command: -p 5432
 
   seeder:
     container_name: cookie-supply-management-seed
@@ -47,7 +48,7 @@ services:
     networks:
       - default
     env_file:
-      - .env
+      - .env.docker
 
   redis:
     image: redis
@@ -61,7 +62,7 @@ services:
     networks:
       - default
     env_file:
-      - .env
+      - .env.docker
 
 volumes:
   postgres_data:

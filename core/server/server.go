@@ -7,6 +7,8 @@ import (
 	"cookie_supply_management/core/redis"
 	"cookie_supply_management/internal/repositories"
 	"cookie_supply_management/internal/services"
+	"cookie_supply_management/pkg/base/base_repository"
+	"cookie_supply_management/pkg/base/base_service"
 	"cookie_supply_management/pkg/logger"
 	"errors"
 	"fmt"
@@ -38,6 +40,10 @@ func (s *Server) Init() (*gin.Engine, error) {
 	//init redis
 	rds := redis.New(conf.Redis)
 
+	//init crud
+	repoCrud := base_repository.NewCrudRepository(dbase, rds)
+	serviceCrud := base_service.NewCrudService(repoCrud)
+
 	//init entities
 	repo := repositories.NewRepository(dbase, rds)
 	service := services.NewService(repo, conf)
@@ -52,7 +58,7 @@ func (s *Server) Init() (*gin.Engine, error) {
 	connect.DB = dbase
 
 	//routing api
-	r := SetupRoutesWithDeps(service)
+	r := SetupRoutesWithDeps(service, serviceCrud)
 
 	return r, nil
 }

@@ -1,4 +1,4 @@
-package models
+package base_model
 
 import (
 	"encoding/json"

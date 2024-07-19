@@ -2,7 +2,7 @@ package server
 
 import (
 	"cookie_supply_management/internal/seeds"
-	"cookie_supply_management/pkg/generic_seed"
+	"cookie_supply_management/pkg/base/base_seed"
 	"log"
 
 	"github.com/elliotchance/orderedmap"
@@ -33,6 +33,6 @@ func Runner(sources []string) {
 }
 
 func runSeed(fn interface{}) {
-	call := fn.(func() (generic_seed.Summary, error))
+	call := fn.(func() (base_seed.Summary, error))
 	call()
 }
