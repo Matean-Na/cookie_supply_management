@@ -88,13 +88,10 @@ func ErrNotFound(ctx *gin.Context, instance interface{}, id uint, params string)
 	}
 }
 
-func ErrNotCreated(ctx *gin.Context, err error, instance interface{}) *AppError {
-	message := localizer.Localize(ctx, "exception:failed-to-create-record", map[string]interface{}{
-		"Table": base_model.GetTableName(instance, connect.DB),
-	})
+func ErrNotCreated(err error) *AppError {
 	return &AppError{
 		Code:    http.StatusBadRequest,
-		Message: message,
+		Message: err.Error(),
 	}
 }
 

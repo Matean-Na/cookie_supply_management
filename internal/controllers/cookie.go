@@ -12,13 +12,13 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-type CookieTypeController struct {
+type CookieController struct {
 	*base_controller.CrudController
 	middlewares.AuthMiddlewareInterface
 }
 
-func NewCookieTypeController(service base_service.CrudServiceInterface, middleware middlewares.AuthMiddlewareInterface) *CookieTypeController {
-	c := &CookieTypeController{
+func NewCookieController(service base_service.CrudServiceInterface, middleware middlewares.AuthMiddlewareInterface) *CookieController {
+	c := &CookieController{
 		CrudController:          base_controller.NewCrudController(service),
 		AuthMiddlewareInterface: middleware,
 	}
@@ -27,23 +27,23 @@ func NewCookieTypeController(service base_service.CrudServiceInterface, middlewa
 	return c
 }
 
-func (c *CookieTypeController) GetAll() interface{} {
-	return &[]models.CookieType{}
+func (c *CookieController) GetAll() interface{} {
+	return &[]models.Cookie{}
 }
 
-func (c *CookieTypeController) GetOne() base_model.HasId {
-	return &models.CookieType{}
+func (c *CookieController) GetOne() base_model.HasId {
+	return &models.Cookie{}
 }
 
-func (c *CookieTypeController) ScopeAll(db *gorm.DB) *gorm.DB {
+func (c *CookieController) ScopeAll(db *gorm.DB) *gorm.DB {
 	return db
 }
 
-func (c *CookieTypeController) ScopeOne(db *gorm.DB) *gorm.DB {
+func (c *CookieController) ScopeOne(db *gorm.DB) *gorm.DB {
 	return db.Preload(clause.Associations)
 }
 
-func (c *CookieTypeController) Register(r *gin.RouterGroup, s string) *gin.RouterGroup {
+func (c *CookieController) Register(r *gin.RouterGroup, s string) *gin.RouterGroup {
 	g := r.Group(s)
 	g.GET("", c.Authentication(constants.Accountant), base_controller.AppHandler(c.CrudInterface.FindAll).Handle)
 	g.GET(":id", c.Authentication(constants.Accountant), base_controller.AppHandler(c.CrudInterface.FindOne).Handle)

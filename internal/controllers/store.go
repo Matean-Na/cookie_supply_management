@@ -2,80 +2,59 @@ package controllers
 
 import (
 	"cookie_supply_management/internal/constants"
-	"cookie_supply_management/internal/dto"
 	"cookie_supply_management/internal/middlewares"
+	"cookie_supply_management/internal/models"
 	"cookie_supply_management/internal/services"
-	"cookie_supply_management/utils/parsers"
+	"cookie_supply_management/pkg/base/base_controller"
+	"cookie_supply_management/pkg/base/base_model"
+	"cookie_supply_management/pkg/base/base_service"
 	"github.com/gin-gonic/gin"
-	"net/http"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type StoreController struct {
-	service    services.StoreServiceInterface
-	middleware middlewares.AuthMiddlewareInterface
+	services.StoreServiceInterface
+	middlewares.AuthMiddlewareInterface
+
+	*base_controller.CrudController
 }
 
-func NewStoreController(service services.StoreServiceInterface, middleware middlewares.AuthMiddlewareInterface) *StoreController {
-	return &StoreController{
-		service:    service,
-		middleware: middleware,
+func NewStoreController(
+	service services.StoreServiceInterface,
+	middleware middlewares.AuthMiddlewareInterface,
+	crudService base_service.CrudServiceInterface) *StoreController {
+	c := &StoreController{
+		CrudController:          base_controller.NewCrudController(crudService),
+		AuthMiddlewareInterface: middleware,
 	}
+	c.CrudInterface = c
+	c.ModelInterface = c
+	return c
 }
 
-func (sc *StoreController) Register(r *gin.RouterGroup, s string) *gin.RouterGroup {
+func (c *StoreController) GetAll() interface{} {
+	return &[]models.Store{}
+}
+
+func (c *StoreController) GetOne() base_model.HasId {
+	return &models.Store{}
+}
+
+func (c *StoreController) ScopeAll(db *gorm.DB) *gorm.DB {
+	return db
+}
+
+func (c *StoreController) ScopeOne(db *gorm.DB) *gorm.DB {
+	return db.Preload(clause.Associations)
+}
+
+func (c *StoreController) Register(r *gin.RouterGroup, s string) *gin.RouterGroup {
 	g := r.Group(s)
-	g.POST("create", sc.middleware.Authentication(constants.Accountant), AppHandler(sc.CreateStore).Handle)
-	g.GET(":id", sc.middleware.Authentication(constants.Accountant), AppHandler(sc.GetOne).Handle)
-	g.GET("", sc.middleware.Authentication(constants.Accountant), AppHandler(sc.GetAll).Handle)
-	g.DELETE(":id", sc.middleware.Authentication(constants.Accountant), AppHandler(sc.DeleteStore).Handle)
+	g.GET("", c.Authentication(constants.Accountant), base_controller.AppHandler(c.CrudInterface.FindAll).Handle)
+	g.GET(":id", c.Authentication(constants.Accountant), base_controller.AppHandler(c.CrudInterface.FindOne).Handle)
+	g.POST("", c.Authentication(constants.Accountant), base_controller.AppHandler(c.CrudInterface.Create).Handle)
+	g.PATCH(":id", c.Authentication(constants.Accountant), base_controller.AppHandler(c.CrudInterface.Update).Handle)
+	g.DELETE(":id", c.Authentication(constants.Accountant), base_controller.AppHandler(c.CrudInterface.Delete).Handle)
 	return g
-}
-
-func (sc *StoreController) CreateStore(ctx *gin.Context) *AppError {
-	var input dto.StoreCreateDTO
-	if err := ctx.ShouldBindJSON(&input); err != nil {
-		return BaseError(err.Error(), http.StatusBadRequest)
-	}
-
-	httpCode, err := sc.service.CreateStore(input)
-	if err != nil {
-		return BaseError(err.Error(), httpCode)
-	}
-
-	return Ok(ctx, gin.H{"message": "success"})
-}
-
-func (sc *StoreController) GetOne(ctx *gin.Context) *AppError {
-	storeId := ctx.Param("id")
-	id := parsers.ParamUint(storeId)
-
-	store, httpCode, err := sc.service.GetOneStore(id)
-	if err != nil {
-		return BaseError(err.Error(), httpCode)
-	}
-
-	return Ok(ctx, store)
-}
-
-func (sc *StoreController) GetAll(ctx *gin.Context) *AppError {
-	//page, page_size := GetPager(ctx)
-
-	store, httpCode, err := sc.service.GetAllStore()
-	if err != nil {
-		return BaseError(err.Error(), httpCode)
-	}
-
-	return Ok(ctx, store)
-}
-
-func (sc *StoreController) DeleteStore(ctx *gin.Context) *AppError {
-	//page, page_size := GetPager(ctx)
-	storeId := ctx.Param("id")
-	id := parsers.ParamUint(storeId)
-	httpCode, err := sc.service.DeleteOneStore(id)
-	if err != nil {
-		return BaseError(err.Error(), httpCode)
-	}
-
-	return Ok(ctx, gin.H{"message": "success"})
 }

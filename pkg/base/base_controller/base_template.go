@@ -4,6 +4,7 @@ import (
 	"cookie_supply_management/pkg/base/base_service"
 	"cookie_supply_management/utils/parsers"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"reflect"
 )
 
@@ -68,7 +69,7 @@ func (ct *CrudTemplate) CreateFunc(ctx *gin.Context, create base_service.Create)
 	i := ct.mi.GetOne()
 
 	if err := ctx.ShouldBindJSON(i); err != nil {
-		return LocalizeError(ctx, err)
+		return BaseError(err.Error(), http.StatusBadRequest)
 	}
 
 	//set code in model from context
@@ -80,7 +81,7 @@ func (ct *CrudTemplate) CreateFunc(ctx *gin.Context, create base_service.Create)
 	}
 
 	if err := create(i, ct.ri.KeyAll()); err != nil {
-		return ErrNotCreated(ctx, err, nil)
+		return ErrNotCreated(err)
 	}
 
 	return Ok(ctx, gin.H{"id": i.GetId()})

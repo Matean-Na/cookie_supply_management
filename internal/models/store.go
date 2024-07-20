@@ -1,12 +1,15 @@
 package models
 
-import "github.com/shopspring/decimal"
+import (
+	"cookie_supply_management/pkg/base/base_model"
+	"github.com/shopspring/decimal"
+)
 
 type Store struct {
-	Entity
+	base_model.Entity
 	Name        string          `json:"name"`
 	Address     string          `json:"address"`
-	Contact     string          `json:"role"`
-	PhoneNumber string          `json:"phoneNumber"`
+	Contact     string          `json:"contact"`
+	PhoneNumber string          `json:"phone_number"`
 	Debt        decimal.Decimal `json:"debt"`
 }

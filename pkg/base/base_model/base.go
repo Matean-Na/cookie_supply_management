@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"reflect"
 	"strings"
+	"time"
 )
 
 type HasId interface {
@@ -14,7 +15,12 @@ type HasId interface {
 	GetReadOnlyFields() []string
 }
 
-type Entity gorm.Model
+type Entity struct {
+	ID        uint           `gorm:"primarykey" json:"id"`
+	CreatedAt time.Time      `json:"createdAt"`
+	UpdatedAt time.Time      `json:"updatedAt"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deletedAt"`
+}
 
 func GetTableName(m interface{}, db *gorm.DB) string {
 	st := &gorm.Statement{DB: db}
