@@ -50,6 +50,7 @@ var Models = []interface{}{
 	//auth
 	&models.User{},
 	&models.Store{},
+	&models.Sale{},
 
 	//cookie
 	&models.Cookie{},
