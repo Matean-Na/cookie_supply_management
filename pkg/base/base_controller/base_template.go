@@ -38,7 +38,7 @@ func (ct *CrudTemplate) FindAllFunc(ctx *gin.Context, findAll base_service.FindA
 	pager := GetPager(ctx)
 
 	var total int64
-	if err := findAll(model, ct.mi.ScopeAll, pager, GetOrder(ctx, ct.mi.GetOne()), &total, GetQuery(ctx, model), ct.ri.KeyAll()); err != nil {
+	if err := findAll(&model, ct.mi.ScopeAll, pager, GetOrder(ctx, ct.mi.GetOne()), &total, GetQuery(ctx, model), ct.ri.KeyAll()); err != nil {
 		return I18nError(ctx, model, "exception:could-not-fetch-records")
 	}
 

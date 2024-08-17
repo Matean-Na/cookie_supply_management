@@ -10,7 +10,7 @@ import (
 )
 
 type CrudRepositoryInterface interface {
-	FindAll(pager Pager, order OrderFilter, scope Scope, total *int64, model interface{}, searcher Searcher) error
+	FindAll(pager Pager, order OrderFilter, scope Scope, total *int64, model *interface{}, searcher Searcher) error
 	FindOne(id uint, scope Scope, model interface{}) error
 	Create(model base_model.HasId) error
 	Update(model base_model.HasId) error
@@ -63,17 +63,17 @@ func (cr *CrudRepository) DeleteCacheWithKey(key string) error {
 	return nil
 }
 
-func (cr *CrudRepository) FindAll(pager Pager, order OrderFilter, scope Scope, total *int64, model interface{}, searcher Searcher) error {
+func (cr *CrudRepository) FindAll(pager Pager, order OrderFilter, scope Scope, total *int64, model *interface{}, searcher Searcher) error {
 	if err := cr.db.Model(model).Scopes(scope).Count(total).Error; err != nil {
 		return err
 	}
 
 	if searcher != nil {
-		if err := cr.db.Where(searcher.getQueryJoin()).Joins(searcher.getJoinModels()).Scopes(pager.Paginate(), order.sort(), scope).Find(model).Error; err != nil {
+		if err := cr.db.Where(searcher.getQueryJoin()).Joins(searcher.getJoinModels()).Scopes(pager.Paginate(), order.sort(), scope).Find(*model).Error; err != nil {
 			return err
 		}
 	} else {
-		if err := cr.db.Scopes(pager.Paginate(), order.sort(), scope).Find(model).Error; err != nil {
+		if err := cr.db.Scopes(pager.Paginate(), order.sort(), scope).Find(*model).Error; err != nil {
 			return err
 		}
 	}

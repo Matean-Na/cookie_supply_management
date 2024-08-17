@@ -7,14 +7,14 @@ import (
 	"fmt"
 )
 
-type FindAll func(model interface{}, scope base_repository.Scope, pager base_repository.Pager, order base_repository.OrderFilter, total *int64, searcher base_repository.Searcher, keyAll string) error
+type FindAll func(model *interface{}, scope base_repository.Scope, pager base_repository.Pager, order base_repository.OrderFilter, total *int64, searcher base_repository.Searcher, keyAll string) error
 type FindOne func(model base_model.HasId, scope base_repository.Scope) error
 type Create func(model base_model.HasId, keyAll string) error
 type Update func(model base_model.HasId, keyAll string) error
 type Delete func(model base_model.HasId, keyAll string) error
 
 type FindAllInterface interface {
-	FindAll(model interface{}, scope base_repository.Scope, pager base_repository.Pager, order base_repository.OrderFilter, total *int64, searcher base_repository.Searcher, keyAll string) error
+	FindAll(model *interface{}, scope base_repository.Scope, pager base_repository.Pager, order base_repository.OrderFilter, total *int64, searcher base_repository.Searcher, keyAll string) error
 }
 
 type FindOneInterface interface {
@@ -56,18 +56,18 @@ func NewCrudService(repo base_repository.CrudRepositoryInterface) *CrudService {
 	}
 }
 
-func (c *CrudService) FindAll(model interface{}, scope base_repository.Scope, pager base_repository.Pager, order base_repository.OrderFilter, total *int64, searcher base_repository.Searcher, keyAll string) error {
+func (c *CrudService) FindAll(model *interface{}, scope base_repository.Scope, pager base_repository.Pager, order base_repository.OrderFilter, total *int64, searcher base_repository.Searcher, keyAll string) error {
 	cacheKey := fmt.Sprintf("%s_%d_%d", keyAll, pager.GetPage(), pager.GetPageSize())
 	cachedData, err := c.repo.GetCache(cacheKey)
 	if err == nil {
 		var cache CacheResponse
-		if err = json.Unmarshal([]byte(*cachedData), &cache); err == nil {
+		if err = json.Unmarshal([]byte(*cachedData), &cache); err != nil {
 			return err
 		}
-		model = cache.Model
-		total = &cache.Total
-
+		*model = cache.Model
+		*total = cache.Total
 		return nil
+
 	}
 
 	if err = c.repo.FindAll(pager, order, scope, total, model, searcher); err != nil {
