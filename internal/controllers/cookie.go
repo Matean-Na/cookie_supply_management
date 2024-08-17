@@ -36,7 +36,7 @@ func (c *CookieController) GetOne() base_model.HasId {
 }
 
 func (c *CookieController) ScopeAll(db *gorm.DB) *gorm.DB {
-	return db
+	return db.Preload(clause.Associations)
 }
 
 func (c *CookieController) ScopeOne(db *gorm.DB) *gorm.DB {
