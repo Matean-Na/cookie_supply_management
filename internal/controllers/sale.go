@@ -40,7 +40,7 @@ func (c *SaleController) GetOne() base_model.HasId {
 }
 
 func (c *SaleController) ScopeAll(db *gorm.DB) *gorm.DB {
-	return db
+	return db.Preload(clause.Associations)
 }
 
 func (c *SaleController) ScopeOne(db *gorm.DB) *gorm.DB {
