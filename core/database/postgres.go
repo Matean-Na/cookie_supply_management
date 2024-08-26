@@ -51,6 +51,7 @@ var Models = []interface{}{
 	&models.User{},
 	&models.Store{},
 	&models.Sale{},
+	&models.Payment{},
 
 	//cookie
 	&models.Cookie{},

@@ -12,4 +12,5 @@ type Store struct {
 	Contact     string          `json:"contact"`
 	PhoneNumber string          `json:"phone_number"`
 	Debt        decimal.Decimal `json:"debt"`
+	Payment     []Payment       `json:"payment"`
 }

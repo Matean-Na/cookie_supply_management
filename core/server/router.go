@@ -31,6 +31,7 @@ func SetupRoutesWithDeps(service *services.Service, serviceCrud base_service.Cru
 		r.Set("cookie", controllers.NewCookieController(serviceCrud, middleware.AuthMiddlewareInterface))
 		r.Set("cookie_type", controllers.NewCookieTypeController(serviceCrud, middleware.AuthMiddlewareInterface))
 		r.Set("sale", controllers.NewSaleController(middleware.AuthMiddlewareInterface, serviceCrud))
+		r.Set("payment", controllers.NewPaymentController(middleware.AuthMiddlewareInterface, serviceCrud))
 
 		for g := r.Front(); g != nil; g = g.Next() {
 			if c, ok := g.Value.(Controller); ok {
