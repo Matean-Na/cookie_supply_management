@@ -59,7 +59,7 @@ func NewCrudService(repo base_repository.CrudRepositoryInterface) *CrudService {
 func (c *CrudService) FindAll(model *interface{}, scope base_repository.Scope, pager base_repository.Pager, order base_repository.OrderFilter, total *int64, searcher base_repository.Searcher, keyAll string) error {
 	cacheKey := fmt.Sprintf("%s_%d_%d", keyAll, pager.GetPage(), pager.GetPageSize())
 	cachedData, err := c.repo.GetCache(cacheKey)
-	if err == nil {
+	if err == nil && searcher == nil {
 		var cache CacheResponse
 		if err = json.Unmarshal([]byte(*cachedData), &cache); err != nil {
 			return err
